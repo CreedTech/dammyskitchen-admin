@@ -4,45 +4,43 @@ import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 
 const AddSideDishAndProtein = ({ token }) => {
-  const [isSideDish, setIsSideDish] = useState(true); // Toggle between Side Dish and Protein
+  //   const [isSideDish, setIsSideDish] = useState(true); // Toggle between Side Dish and Protein
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  //   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-//   const [linkedMeals, setLinkedMeals] = useState([]); // Array of selected product IDs
-//   const [products, setProducts] = useState([]); // List of products from backend
+  //   const [linkedMeals, setLinkedMeals] = useState([]); // Array of selected product IDs
+  //   const [products, setProducts] = useState([]); // List of products from backend
 
-//   useEffect(() => {
-//     // Fetch available products from the backend
-//     const fetchProducts = async () => {
-//       try {
-//         const response = await axios.get(`${backendUrl}/api/product/list`, {
-//           headers: { token },
-//         });
-//         if (response.data.success) {
-//           setProducts(response.data.products);
-//         } else {
-//           toast.error('Failed to fetch products');
-//         }
-//       } catch (error) {
-//         console.error('Error fetching products:', error);
-//         toast.error('Error fetching products');
-//       }
-//     };
+  //   useEffect(() => {
+  //     // Fetch available products from the backend
+  //     const fetchProducts = async () => {
+  //       try {
+  //         const response = await axios.get(`${backendUrl}/api/product/list`, {
+  //           headers: { token },
+  //         });
+  //         if (response.data.success) {
+  //           setProducts(response.data.products);
+  //         } else {
+  //           toast.error('Failed to fetch products');
+  //         }
+  //       } catch (error) {
+  //         console.error('Error fetching products:', error);
+  //         toast.error('Error fetching products');
+  //       }
+  //     };
 
-//     fetchProducts();
-//   }, [token]);
+  //     fetchProducts();
+  //   }, [token]);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     try {
-      const endpoint = isSideDish
-        ? `${backendUrl}/api/side-dishes/add`
-        : `${backendUrl}/api/proteins/add`;
+      const endpoint = `${backendUrl}/api/proteins/add`;
 
       const data = {
         name,
-        description,
+        // description,
         price: parseFloat(price),
         // meals: linkedMeals, // Array of selected product IDs
       };
@@ -52,9 +50,8 @@ const AddSideDishAndProtein = ({ token }) => {
       });
 
       if (response.data.success) {
-        toast.success(`${isSideDish ? 'Side Dish' : 'Protein'} added successfully!`);
+        toast.success(`Protein added successfully!`);
         setName('');
-        setDescription('');
         setPrice('');
         // setLinkedMeals([]);
       } else {
@@ -66,23 +63,29 @@ const AddSideDishAndProtein = ({ token }) => {
     }
   };
 
-//   const handleMealSelection = (id) => {
-//     setLinkedMeals((prev) =>
-//       prev.includes(id) ? prev.filter((mealId) => mealId !== id) : [...prev, id]
-//     );
-//   };
+  //   const handleMealSelection = (id) => {
+  //     setLinkedMeals((prev) =>
+  //       prev.includes(id) ? prev.filter((mealId) => mealId !== id) : [...prev, id]
+  //     );
+  //   };
 
   return (
     <div className="flex flex-col items-center w-full p-4">
-      <h1 className="text-2xl font-bold mb-4">{isSideDish ? 'Add Side Dish' : 'Add Protein'}</h1>
-      <button
+      <h1 className="text-2xl font-bold mb-4">
+        {/* {isSideDish ? 'Add Side Dish' : 'Add Protein'} */}
+        Add Protein
+      </h1>
+      {/* <button
         onClick={() => setIsSideDish((prev) => !prev)}
         className="bg-black text-white py-2 px-4 rounded mb-4"
       >
         Switch to {isSideDish ? 'Protein' : 'Side Dish'}
-      </button>
+      </button> */}
 
-      <form onSubmit={onSubmitHandler} className="flex flex-col gap-4 w-full max-w-md">
+      <form
+        onSubmit={onSubmitHandler}
+        className="flex flex-col gap-4 w-full max-w-md"
+      >
         <div>
           <label className="block mb-2">Name</label>
           <input
@@ -90,12 +93,12 @@ const AddSideDishAndProtein = ({ token }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
-            placeholder={`Enter ${isSideDish ? 'side dish' : 'protein'} name`}
+            placeholder={`Enter protein name`}
             required
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block mb-2">Description</label>
           <textarea
             value={description}
@@ -103,10 +106,10 @@ const AddSideDishAndProtein = ({ token }) => {
             className="w-full px-3 py-2 border border-gray-300 rounded"
             placeholder={`Describe the ${isSideDish ? 'side dish' : 'protein'}`}
           ></textarea>
-        </div>
+        </div> */}
 
         <div>
-          <label className="block mb-2">Price ($)</label>
+          <label className="block mb-2">Price (£)</label>
           <input
             type="number"
             step="0.01"
@@ -139,7 +142,7 @@ const AddSideDishAndProtein = ({ token }) => {
           type="submit"
           className="bg-black text-white py-2 px-4 rounded hover:bg-green-600 transition"
         >
-          Add {isSideDish ? 'Side Dish' : 'Protein'}
+          Add Protein
         </button>
       </form>
     </div>

@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { backendUrl, currency } from '../App';
 import { toast } from 'react-toastify';
 
-const ListSideDishes = ({ token }) => {
+const ListContainers = ({ token }) => {
   const [list, setList] = useState([]);
 
   const fetchList = async () => {
     try {
-      const response = await axios.get(backendUrl + '/api/side-dishes/list');
+      const response = await axios.get(backendUrl + '/api/containers/list');
       if (response.data.success) {
-        setList(response.data?.sideDishes?.reverse());
+        setList(response.data?.containers?.reverse());
       } else {
         toast.error(response.data.message);
       }
@@ -23,7 +23,7 @@ const ListSideDishes = ({ token }) => {
   const removeProduct = async (id) => {
     try {
       const response = await axios.post(
-        backendUrl + '/api/side-dishes/remove',
+        backendUrl + '/api/containers/delete',
         { id },
         { headers: { token } }
       );
@@ -52,9 +52,10 @@ const ListSideDishes = ({ token }) => {
 
         <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm">
           {/* <b>Image</b> */}
-          <b>Name</b>
-          <b>Description</b>
+          <b>Size</b>
+          {/* <b>Description</b> */}
           <b>Price</b>
+           <b>Includes Protein</b>
           <b className="text-center">Action</b>
         </div>
 
@@ -71,12 +72,12 @@ const ListSideDishes = ({ token }) => {
               alt=""
             /> */}
 
-            <p>{item.name}</p>
-            <p>{item.description}</p>
+            <p>{item.size}</p>
             <p>
               {currency}
               {item.price}
             </p>
+            <p>{item.includesProtein.toString().toUpperCase()}</p>
             <p
               onClick={() => removeProduct(item._id)}
               className="text-right md:text-center cursor-pointer text-lg"
@@ -90,4 +91,4 @@ const ListSideDishes = ({ token }) => {
   );
 };
 
-export default ListSideDishes;
+export default ListContainers;

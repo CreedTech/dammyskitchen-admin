@@ -17,36 +17,9 @@ const Add = ({ token }) => {
   const [containers, setContainers] = useState([]);
   const [selectedProteins, setSelectedProteins] = useState([]);
   const [selectedContainers, setSelectedContainers] = useState([]);
-  // const [proteinsIncluded, setProteinsIncluded] = useState([]);
-  // const [extraProteins, setExtraProteins] = useState([]);
-  // const [containerSizes, setContainerSizes] = useState([]);
-  // const [category, setCategory] = useState('Food');
-  // const [subCategory, setSubCategory] = useState('Main');
   const [bestseller, setBestseller] = useState(false);
-  // const [sizes, setSizes] = useState([]);
-  // const [litresAvailability, setLitresAvailability] = useState(false);
-  // const [types, setTypes] = useState([]);
   const [spiceLevels, setSpiceLevels] = useState([]);
   const [tags, setTags] = useState('');
-  // const [proteins, setProteins] = useState([]);
-  // const [sideDishes, setSideDishes] = useState([]);
-  // const [selectedProteins, setSelectedProteins] = useState([]);
-  // const [selectedSideDishes, setSelectedSideDishes] = useState([]);
-
-  // const handleAddProteinIncluded = (protein) => {
-  //   setProteinsIncluded([...proteinsIncluded, protein]);
-  // };
-
-  // const handleAddExtraProtein = (protein) => {
-  //   setExtraProteins([...extraProteins, protein]);
-  // };
-
-  // const handleAddContainerSize = (size, price, includesProtein) => {
-  //   setContainerSizes([
-  //     ...containerSizes,
-  //     { size, price: Number(price), includesProtein: Boolean(includesProtein) },
-  //   ]);
-  // };
 
   useEffect(() => {
     // Fetch proteins and side dishes from backend
@@ -75,33 +48,26 @@ const Add = ({ token }) => {
     );
   };
 
-  // const handleProteinSelect = (id) => {
-  //   setSelectedProteins((prev) =>
-  //     prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-  //   );
-  // };
-
-  // const handleSideDishSelect = (id) => {
-  //   setSelectedSideDishes((prev) =>
-  //     prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-  //   );
-  // };
-
-  // const handleTypeSelect = (type) => {
-  //   setTypes((prev) =>
-  //     prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-  //   );
-  // };
-
-  const handleSpiceLevelSelect = (level) => {
-    setSpiceLevels((prev) =>
-      prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]
-    );
-  };
-
   const handleTagsChange = (e) => {
     setTags(e.target.value);
   };
+
+  // useEffect(() => {
+  //   const calculatePriceFromContainers = () => {
+  //     if (selectedContainers.length > 0) {
+  //       // Assume `selectedContainers` contains objects with a `price` field
+  //       const containerPrice = selectedContainers.reduce(
+  //         (acc, container) => acc + (container.price || 0),
+  //         0
+  //       );
+  //       setPrice(containerPrice); // Update the price state
+  //     } else {
+  //       setPrice(15); // Default base price
+  //     }
+  //   };
+
+  //   calculatePriceFromContainers();
+  // }, [selectedContainers]);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -112,19 +78,14 @@ const Add = ({ token }) => {
       formData.append('name', name);
       formData.append('description', description);
       formData.append('price', price);
-      // formData.append('category', category);
-      // formData.append('subCategory', subCategory);
       formData.append('bestseller', bestseller);
-      // formData.append('sizes', JSON.stringify(sizes));
-      // formData.append('litresAvailability', litresAvailability);
-      // formData.append('types', JSON.stringify(types));
       formData.append('spiceLevels', JSON.stringify(spiceLevels));
       formData.append(
         'tags',
         JSON.stringify(tags.split(',').map((tag) => tag.trim()))
       );
       formData.append('proteins', JSON.stringify(selectedProteins));
-      formData.append('containers', JSON.stringify(selectedContainers));
+      formData.append('containerSizes', JSON.stringify(selectedContainers));
 
       image1 && formData.append('image1', image1);
       image2 && formData.append('image2', image2);
@@ -148,14 +109,10 @@ const Add = ({ token }) => {
         setImage3(false);
         setImage4(false);
         setPrice(15);
-        // setSizes([]);
-        // setLitresAvailability(false);
-        // setTypes([]);
         setSelectedProteins([]);
         setSelectedContainers([]);
         setTags('');
         setSelectedProteins([]);
-        // setSelectedSideDishes([]);
       } else {
         toast.error(response.data.message);
       }
@@ -225,30 +182,6 @@ const Add = ({ token }) => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
-        {/* <div>
-          <p className="mb-2">Category</p>
-          <select
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2"
-          >
-            <option value="Food">Food</option>
-            <option value="Cake">Cake</option>
-            <option value="Snacks">Snacks</option>
-          </select>
-        </div>
-
-        <div>
-          <p className="mb-2">Subcategory</p>
-          <select
-            onChange={(e) => setSubCategory(e.target.value)}
-            className="w-full px-3 py-2"
-          >
-            <option value="Main">Main</option>
-            <option value="Side">Side</option>
-            <option value="Dessert">Dessert</option>
-          </select>
-        </div> */}
-
         <div>
           <p className="mb-2">Price</p>
           <input
@@ -260,33 +193,6 @@ const Add = ({ token }) => {
           />
         </div>
       </div>
-
-      {/* Sizes */}
-      {/* <div>
-        <p className="mb-2">Product Sizes</p>
-        <div className="flex gap-3">
-          {['S', 'M', 'L', 'XL'].map((size) => (
-            <div
-              key={size}
-              onClick={() =>
-                setSizes((prev) =>
-                  prev.includes(size)
-                    ? prev.filter((s) => s !== size)
-                    : [...prev, size]
-                )
-              }
-            >
-              <p
-                className={`${
-                  sizes.includes(size) ? 'bg-pink-100' : 'bg-slate-200'
-                } px-3 py-1 cursor-pointer`}
-              >
-                {size}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div> */}
 
       {/* Tags */}
       <div className="w-full">
@@ -300,49 +206,26 @@ const Add = ({ token }) => {
         />
       </div>
 
-      {/* Proteins, Side Dishes, and Spice Levels */}
-      {/* <div>
-        <h3>Proteins</h3>
-        {proteins.length === 0 ? ( // Check if there are no side dishes
-          <p className="text-gray-500">No protein available</p>
-        ) : (
-          <div className="flex gap-3 flex-wrap">
-            {proteins.map((protein) => (
-              <div
-                key={protein._id}
-                onClick={() =>
-                  selectedProteins(
-                    (prev) =>
-                      prev.includes(protein)
-                        ? prev.filter((s) => s !== protein) // Remove from selection
-                        : [...prev, protein] // Add to selection
-                  )
-                }
-                className={`${
-                  selectedProteins.includes(protein)
-                    ? 'bg-pink-100'
-                    : 'bg-slate-200'
-                } px-3 py-1 cursor-pointer rounded`}
-              >
-                {protein.name} (+£{protein.price})
-              </div>
-            ))}
-          </div>
-        )}
-     
-      </div> */}
-       <div className="mb-6">
+      <div className="mb-6">
         <h3 className="text-sm font-medium mb-2">Select Proteins</h3>
         <div className="flex gap-3 flex-wrap">
           {proteins.map((protein) => (
             <div
               key={protein._id}
-              onClick={() => toggleSelection(protein._id, setSelectedProteins, selectedProteins)}
+              onClick={() =>
+                toggleSelection(
+                  protein._id,
+                  setSelectedProteins,
+                  selectedProteins
+                )
+              }
               className={`px-3 py-2 border rounded-md cursor-pointer ${
-                selectedProteins.includes(protein._id) ? 'bg-blue-100 border-blue-500' : 'bg-white'
+                selectedProteins.includes(protein._id)
+                  ? 'bg-blue-100 border-blue-500'
+                  : 'bg-white'
               }`}
             >
-              {protein.name} (+£{protein.price})
+              {protein.name} <br /> +£{protein.price}
             </div>
           ))}
         </div>
@@ -355,7 +238,11 @@ const Add = ({ token }) => {
             <div
               key={container._id}
               onClick={() =>
-                toggleSelection(container._id, setSelectedContainers, selectedContainers)
+                toggleSelection(
+                  container._id,
+                  setSelectedContainers,
+                  selectedContainers
+                )
               }
               className={`px-3 py-2 border rounded-md cursor-pointer ${
                 selectedContainers.includes(container._id)
@@ -363,71 +250,12 @@ const Add = ({ token }) => {
                   : 'bg-white'
               }`}
             >
-              {container.size} (£{container.price}){' '}
+              {container.size} <br /> £{container.price} <br />
               {container.includesProtein ? '(Includes Protein)' : '(Plain)'}
             </div>
           ))}
         </div>
       </div>
-
-      {/* <div>
-        <h3>Side Dishes</h3>
-        {sideDishes.length === 0 ? ( // Check if there are no side dishes
-          <p className="text-gray-500">No side dish available</p>
-        ) : (
-          <div className="flex gap-3 flex-wrap">
-            {sideDishes.map((sideDish) => (
-              <div
-                key={sideDish._id}
-                onClick={() =>
-                  setSelectedSideDishes(
-                    (prev) =>
-                      prev.includes(sideDish)
-                        ? prev.filter((s) => s !== sideDish) // Remove from selection
-                        : [...prev, sideDish] // Add to selection
-                  )
-                }
-                className={`${
-                  selectedSideDishes.includes(sideDish)
-                    ? 'bg-pink-100'
-                    : 'bg-slate-200'
-                } px-3 py-1 cursor-pointer rounded`}
-              >
-                {sideDish.name} (+£{sideDish.price})
-              </div>
-            ))}
-          </div>
-        )}
-      </div> */}
-
-     
-
-      {/* Types */}
-      {/* <div>
-        <p className="mb-2">Types</p>
-        <div className="flex gap-3">
-          {['Hot', 'Cold'].map((type) => (
-            <div
-              key={type}
-              onClick={() =>
-                setTypes((prev) =>
-                  prev.includes(type)
-                    ? prev.filter((t) => t !== type)
-                    : [...prev, type]
-                )
-              }
-            >
-              <p
-                className={`${
-                  types.includes(type) ? 'bg-pink-100' : 'bg-slate-200'
-                } px-3 py-1 cursor-pointer`}
-              >
-                {type}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div> */}
 
       {/* Spice Levels */}
       <div>
@@ -436,18 +264,50 @@ const Add = ({ token }) => {
           {[0, 1, 2, 3, 4, 5].map((level) => (
             <div
               key={level}
-              onClick={() => setSpiceLevels(level)} // Update state with the selected level
+              onClick={() =>
+                setSpiceLevels(
+                  (prev) =>
+                    prev.includes(level)
+                      ? prev.filter((item) => item !== level) // Remove level if already selected
+                      : [...prev, level] // Add level if not already selected
+                )
+              }
             >
-              <p
-                className={`${
-                  spiceLevels === level ? 'bg-pink-100' : 'bg-slate-200'
-                } px-3 py-1 cursor-pointer`}
+              <div
+                className={`flex items-center justify-center px-3 py-1 cursor-pointer rounded `}
+                style={{
+                  backgroundColor: spiceLevels.includes(level)
+                    ? '#fbcfe8'
+                    : '#e2e8f0',
+                  transition: 'background-color 0.3s ease-in-out',
+                  borderRadius: '0.375rem',
+                  cursor: 'pointer',
+                }}
               >
-                {level}
-              </p>
+                {/* Render chili icons based on the spice level */}
+                {Array.from({ length: level }, (_, i) => (
+                  <span key={i} className="text-red-500 text-lg">
+                    🌶️
+                  </span>
+                ))}
+                {/* Add a placeholder for level 0 (mild) */}
+                {level === 0 && <p className="text-gray-600">Mild</p>}
+              </div>
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="flex gap-2 mt-2">
+        <input
+          onChange={() => setBestseller((prev) => !prev)}
+          checked={bestseller}
+          type="checkbox"
+          id="bestseller"
+        />
+        <label className="cursor-pointer" htmlFor="bestseller">
+          Add to bestseller
+        </label>
       </div>
 
       <button type="submit" className="w-28 py-3 mt-4 bg-black text-white">
