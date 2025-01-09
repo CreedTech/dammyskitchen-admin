@@ -18,6 +18,7 @@ const Add = ({ token }) => {
   const [selectedProteins, setSelectedProteins] = useState([]);
   const [selectedContainers, setSelectedContainers] = useState([]);
   const [bestseller, setBestseller] = useState(false);
+  const spiceLevelOptions = [0, 1, 2, 3, 4, 5]; // Spice levels
   const [spiceLevels, setSpiceLevels] = useState([]);
   const [tags, setTags] = useState('');
 
@@ -50,6 +51,47 @@ const Add = ({ token }) => {
 
   const handleTagsChange = (e) => {
     setTags(e.target.value);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedProteins.length === proteins.length) {
+      // Clear all selections
+      setSelectedProteins([]);
+    } else {
+      // Select all proteins
+      setSelectedProteins(proteins.map((protein) => protein._id));
+    }
+  };
+  // Select or deselect all containers
+  const handleSelectAllContainerSizes = () => {
+    const selectableContainers = containers.filter(
+      (container) => container.price !== Number(price)
+    );
+    if (selectedContainers.length === selectableContainers.length) {
+      setSelectedContainers([]); // Deselect all
+    } else {
+      setSelectedContainers(
+        selectableContainers.map((container) => container._id)
+      );
+    }
+  };
+  // Toggle individual spice level
+  const toggleSpiceLevel = (level) => {
+    setSpiceLevels(
+      (prev) =>
+        prev.includes(level)
+          ? prev.filter((item) => item !== level) // Remove level if already selected
+          : [...prev, level] // Add level if not already selected
+    );
+  };
+
+  // Select all or deselect all spice levels
+  const toggleSelectAll = () => {
+    if (spiceLevels.length === spiceLevelOptions.length) {
+      setSpiceLevels([]); // Deselect all
+    } else {
+      setSpiceLevels(spiceLevelOptions); // Select all
+    }
   };
 
   // useEffect(() => {
@@ -177,7 +219,7 @@ const Add = ({ token }) => {
           value={description}
           className="w-full max-w-[500px] px-3 py-2"
           placeholder="Write content here"
-          required
+          // required
         />
       </div>
 
@@ -208,6 +250,18 @@ const Add = ({ token }) => {
 
       <div className="mb-6">
         <h3 className="text-sm font-medium mb-2">Select Proteins</h3>
+        <div className="flex gap-2 mt-2">
+          <input
+            onClick={handleSelectAll}
+            checked={selectedProteins.length === proteins.length}
+            type="checkbox"
+            id="selectAllProteins"
+          />
+          <label className="cursor-pointer" htmlFor="selectAllProteins">
+            Select All
+          </label>
+        </div>
+
         <div className="flex gap-3 flex-wrap">
           {proteins.map((protein) => (
             <div
@@ -233,66 +287,105 @@ const Add = ({ token }) => {
 
       <div className="mb-6">
         <h3 className="text-sm font-medium mb-2">Select Containers</h3>
+        <div className="flex gap-2 mt-2">
+          <input
+            onClick={handleSelectAllContainerSizes}
+            checked={
+              selectedContainers.length ===
+              containers.filter(
+                (container) => container.price !== Number(price)
+              ).length
+            }
+            type="checkbox"
+            id="selectAllContainers"
+          />
+          <label className="cursor-pointer" htmlFor="selectAllContainers">
+            Select All
+          </label>
+        </div>
         <div className="flex gap-3 flex-wrap">
-          {containers.map((container) => (
-            <div
-              key={container._id}
-              onClick={() =>
-                toggleSelection(
-                  container._id,
-                  setSelectedContainers,
-                  selectedContainers
-                )
-              }
-              className={`px-3 py-2 border rounded-md cursor-pointer ${
-                selectedContainers.includes(container._id)
-                  ? 'bg-green-100 border-green-500'
-                  : 'bg-white'
-              }`}
-            >
-              {container.size} <br /> £{container.price} <br />
-              {container.includesProtein ? '(Includes Protein)' : '(Plain)'}
-            </div>
-          ))}
+         {containers.map((container) => {
+            const isDisabled = container.price === Number(price);
+
+            return (
+              <div
+                key={container._id}
+                onClick={() => {
+                  if (!isDisabled) {
+                    toggleSelection(container._id);
+                  }
+                }}
+                className={`px-3 py-2 border rounded-md cursor-pointer ${
+                  isDisabled
+                    ? 'bg-gray-200 border-gray-400 cursor-not-allowed'
+                    : selectedContainers.includes(container._id)
+                    ? 'bg-green-100 border-green-500'
+                    : 'bg-white'
+                }`}
+                style={{
+                  pointerEvents: isDisabled ? 'none' : 'auto',
+                }}
+              >
+                {container.size} <br /> £{container.price} <br/>
+                 {container.includesProtein ? '(Includes Protein)' : '(Plain)'}
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Spice Levels */}
       <div>
-        <p className="mb-2">Spice Levels</p>
-        <div className="flex gap-3">
-          {[0, 1, 2, 3, 4, 5].map((level) => (
+        <p className="mb-2 font-medium">Spice Levels</p>
+        <div className="flex items-center mb-3">
+          <input
+            type="checkbox"
+            id="select-all-spice"
+            checked={spiceLevels.length === spiceLevelOptions.length}
+            onChange={toggleSelectAll}
+          />
+          <label
+            htmlFor="select-all-spice"
+            className="ml-2 text-sm cursor-pointer"
+          >
+            Select All
+          </label>
+        </div>
+        <div className="flex gap-3 flex-wrap">
+          {spiceLevelOptions.map((level) => (
             <div
               key={level}
-              onClick={() =>
-                setSpiceLevels(
-                  (prev) =>
-                    prev.includes(level)
-                      ? prev.filter((item) => item !== level) // Remove level if already selected
-                      : [...prev, level] // Add level if not already selected
-                )
-              }
+              onClick={() => toggleSpiceLevel(level)}
+              className="flex items-center gap-2 px-3 py-2 border rounded-md bg-white"
+              style={{
+                backgroundColor: spiceLevels.includes(level)
+                  ? '#fbcfe8'
+                  : '#e2e8f0',
+                transition: 'background-color 0.3s ease-in-out',
+                borderRadius: '0.375rem',
+                cursor: 'pointer',
+              }}
             >
-              <div
-                className={`flex items-center justify-center px-3 py-1 cursor-pointer rounded `}
-                style={{
-                  backgroundColor: spiceLevels.includes(level)
-                    ? '#fbcfe8'
-                    : '#e2e8f0',
-                  transition: 'background-color 0.3s ease-in-out',
-                  borderRadius: '0.375rem',
-                  cursor: 'pointer',
-                }}
-              >
-                {/* Render chili icons based on the spice level */}
-                {Array.from({ length: level }, (_, i) => (
+              {/* <input
+                type="checkbox"
+                id={`spice-level-${level}`}
+                checked={spiceLevels.includes(level)}
+                onChange={() => toggleSpiceLevel(level)}
+              /> */}
+              {/* <label
+                htmlFor={`spice-level-${level}`}
+                className="flex items-center gap-1 cursor-pointer text-sm"
+              > */}
+              {level === 0 ? (
+                <span className="text-gray-600">No Spice</span>
+              ) : (
+                Array.from({ length: level }, (_, i) => (
                   <span key={i} className="text-red-500 text-lg">
                     🌶️
                   </span>
-                ))}
-                {/* Add a placeholder for level 0 (mild) */}
-                {level === 0 && <p className="text-gray-600">Mild</p>}
-              </div>
+                ))
+              )}
+              {/* </label> */}
             </div>
           ))}
         </div>
