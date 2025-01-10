@@ -46,7 +46,7 @@ const ListContainers = ({ token }) => {
 
   return (
     <>
-      <p className="mb-2">All Side Dishes List</p>
+      <p className="mb-2">All Container Sizes List</p>
       <div className="flex flex-col gap-2">
         {/* ------- List Table Title ---------- */}
 

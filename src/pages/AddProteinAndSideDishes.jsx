@@ -1,36 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 
 const AddSideDishAndProtein = ({ token }) => {
-  //   const [isSideDish, setIsSideDish] = useState(true); // Toggle between Side Dish and Protein
   const [name, setName] = useState('');
-  //   const [description, setDescription] = useState('');
+
   const [price, setPrice] = useState('');
-  //   const [linkedMeals, setLinkedMeals] = useState([]); // Array of selected product IDs
-  //   const [products, setProducts] = useState([]); // List of products from backend
 
-  //   useEffect(() => {
-  //     // Fetch available products from the backend
-  //     const fetchProducts = async () => {
-  //       try {
-  //         const response = await axios.get(`${backendUrl}/api/product/list`, {
-  //           headers: { token },
-  //         });
-  //         if (response.data.success) {
-  //           setProducts(response.data.products);
-  //         } else {
-  //           toast.error('Failed to fetch products');
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching products:', error);
-  //         toast.error('Error fetching products');
-  //       }
-  //     };
-
-  //     fetchProducts();
-  //   }, [token]);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
