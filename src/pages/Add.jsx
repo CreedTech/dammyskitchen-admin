@@ -17,6 +17,7 @@ const Add = ({ token }) => {
   const [containers, setContainers] = useState([]);
   const [selectedProteins, setSelectedProteins] = useState([]);
   const [selectedContainers, setSelectedContainers] = useState([]);
+  const [disabledIndex, setDisabledIndex] = useState(null); // Track the index of the disabled item
   const [bestseller, setBestseller] = useState(false);
   const spiceLevelOptions = [0, 1, 2, 3, 4, 5]; // Spice levels
   const [spiceLevels, setSpiceLevels] = useState([]);
@@ -41,7 +42,28 @@ const Add = ({ token }) => {
     fetchOptions();
   }, []);
 
+  // const toggleSelection = (id, setSelectedFn, selectedList) => {
+  //   setSelectedFn(
+  //     selectedList.includes(id)
+  //       ? selectedList.filter((item) => item !== id)
+  //       : [...selectedList, id]
+  //   );
+  // };
+
+  // Update disabledIndex whenever price changes
+  useEffect(() => {
+    const index = containers.findIndex(
+      (container) => container.price === Number(price)
+    );
+    setDisabledIndex(index === -1 ? null : index); // Set the index of the first disabled item
+  }, [price, containers]);
+
   const toggleSelection = (id, setSelectedFn, selectedList) => {
+    if (!Array.isArray(selectedList)) {
+      console.error('selectedList is not an array', selectedList);
+      return;
+    }
+
     setSelectedFn(
       selectedList.includes(id)
         ? selectedList.filter((item) => item !== id)
@@ -63,18 +85,41 @@ const Add = ({ token }) => {
     }
   };
   // Select or deselect all containers
+  // const handleSelectAllContainerSizes = () => {
+  //   const selectableContainers = containers.filter(
+  //     (container) => container.price !== Number(price)
+  //   );
+  //   if (selectedContainers.length === selectableContainers.length) {
+  //     setSelectedContainers([]); // Deselect all
+  //   } else {
+  //     setSelectedContainers(
+  //       selectableContainers.map((container) => container._id)
+  //     );
+  //   }
+  // };
+
   const handleSelectAllContainerSizes = () => {
     const selectableContainers = containers.filter(
-      (container) => container.price !== Number(price)
+      (container, index) =>
+        container.price !== Number(price) &&
+        !(disabledIndex !== null && index <= disabledIndex)
     );
-    if (selectedContainers.length === selectableContainers.length) {
+
+    // Check if all selectable containers are selected
+    const allSelected = selectableContainers.every((container) =>
+      selectedContainers.includes(container._id)
+    );
+
+    if (allSelected) {
       setSelectedContainers([]); // Deselect all
     } else {
       setSelectedContainers(
         selectableContainers.map((container) => container._id)
-      );
+      ); // Select all
     }
+
   };
+
   // Toggle individual spice level
   const toggleSpiceLevel = (level) => {
     setSpiceLevels(
@@ -155,6 +200,7 @@ const Add = ({ token }) => {
         setSelectedContainers([]);
         setTags('');
         setSelectedProteins([]);
+        setSpiceLevels([]);
       } else {
         toast.error(response.data.message);
       }
@@ -252,7 +298,7 @@ const Add = ({ token }) => {
         <h3 className="text-sm font-medium mb-2">Select Proteins</h3>
         <div className="flex gap-2 mt-2">
           <input
-            onClick={handleSelectAll}
+            onChange={handleSelectAll}
             checked={selectedProteins.length === proteins.length}
             type="checkbox"
             id="selectAllProteins"
@@ -289,22 +335,60 @@ const Add = ({ token }) => {
         <h3 className="text-sm font-medium mb-2">Select Containers</h3>
         <div className="flex gap-2 mt-2">
           <input
-            onClick={handleSelectAllContainerSizes}
-            checked={
-              selectedContainers.length ===
-              containers.filter(
-                (container) => container.price !== Number(price)
-              ).length
-            }
+            onChange={handleSelectAllContainerSizes}
+            checked={containers
+              .filter(
+                (container, index) =>
+                  container.price !== Number(price) &&
+                  !(disabledIndex !== null && index <= disabledIndex)
+              )
+              .every((container) => selectedContainers.includes(container._id))}
             type="checkbox"
             id="selectAllContainers"
           />
+
           <label className="cursor-pointer" htmlFor="selectAllContainers">
             Select All
           </label>
         </div>
         <div className="flex gap-3 flex-wrap">
-         {containers.map((container) => {
+          {containers.map((container, index) => {
+            const isDisabled = container.price === Number(price);
+
+            // If any container after the current one is disabled, all prior containers should be disabled
+            const disableThisAndPrior =
+              disabledIndex !== null && index <= disabledIndex;
+
+            return (
+              <div
+                key={container._id}
+                onClick={() => {
+                  if (!isDisabled && !disableThisAndPrior) {
+                    toggleSelection(
+                      container._id,
+                      setSelectedContainers,
+                      selectedContainers
+                    );
+                  }
+                }}
+                className={`px-3 py-2 border rounded-md cursor-pointer ${
+                  isDisabled || disableThisAndPrior
+                    ? 'bg-gray-200 border-gray-400 cursor-not-allowed'
+                    : selectedContainers.includes(container._id)
+                    ? 'bg-green-100 border-green-500'
+                    : 'bg-white'
+                }`}
+                style={{
+                  pointerEvents:
+                    isDisabled || disableThisAndPrior ? 'none' : 'auto',
+                }}
+              >
+                {container.size} <br /> £{container.price} <br />
+                {container.includesProtein ? '(Includes Protein)' : '(Plain)'}
+              </div>
+            );
+          })}
+          {/* {containers.map((container) => {
             const isDisabled = container.price === Number(price);
 
             return (
@@ -330,7 +414,7 @@ const Add = ({ token }) => {
                  {container.includesProtein ? '(Includes Protein)' : '(Plain)'}
               </div>
             );
-          })}
+          })} */}
         </div>
       </div>
 
@@ -340,12 +424,12 @@ const Add = ({ token }) => {
         <div className="flex items-center mb-3">
           <input
             type="checkbox"
-            id="select-all-spice"
+            id="selectAllSpice"
             checked={spiceLevels.length === spiceLevelOptions.length}
             onChange={toggleSelectAll}
           />
           <label
-            htmlFor="select-all-spice"
+            htmlFor="selectAllSpice"
             className="ml-2 text-sm cursor-pointer"
           >
             Select All
@@ -366,16 +450,6 @@ const Add = ({ token }) => {
                 cursor: 'pointer',
               }}
             >
-              {/* <input
-                type="checkbox"
-                id={`spice-level-${level}`}
-                checked={spiceLevels.includes(level)}
-                onChange={() => toggleSpiceLevel(level)}
-              /> */}
-              {/* <label
-                htmlFor={`spice-level-${level}`}
-                className="flex items-center gap-1 cursor-pointer text-sm"
-              > */}
               {level === 0 ? (
                 <span className="text-gray-600">No Spice</span>
               ) : (

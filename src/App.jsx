@@ -10,9 +10,9 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AddSideDishAndProtein from './pages/AddProteinAndSideDishes';
 import ListProtein from './pages/ListProtein';
-import ListSideDishes from './pages/ListContainers';
 import AddContainers from './pages/AddContainers';
 import ListContainers from './pages/ListContainers';
+import CompletedOrders from './pages/completedOrders';
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = '£';
@@ -50,6 +50,7 @@ const App = () => {
                   element={<ListContainers token={token} />}
                 />
                 <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="/completed-orders" element={<CompletedOrders token={token} />} />
                 <Route
                   path="/add-protein"
                   element={<AddSideDishAndProtein token={token} />}
